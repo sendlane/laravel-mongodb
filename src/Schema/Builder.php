@@ -235,8 +235,10 @@ class Builder extends \Illuminate\Database\Schema\Builder
             sort($stat->types);
             $type = implode(', ', $stat->types);
             $name = $stat->_id;
-            if ($name === '_id') {
+            $idColumn = '_id';
+            if ($name === '_id' && $this->connection->getRenameEmbeddedIdField()) {
                 $name = 'id';
+                $idColumn = 'id';
             }
 
             $columns[] = [
@@ -244,11 +246,11 @@ class Builder extends \Illuminate\Database\Schema\Builder
                 'type_name' => $type,
                 'type' => $type,
                 'collation' => null,
-                'nullable' => $name !== 'id',
+                'nullable' => $name !== $idColumn,
                 'default' => null,
                 'auto_increment' => false,
                 'comment' => sprintf('%d occurrences', $stat->total),
-                'generation' => $name === 'id' ? ['type' => 'objectId', 'expression' => null] : null,
+                'generation' => $name === $idColumn ? ['type' => 'objectId', 'expression' => null] : null,
             ];
         }
 
